@@ -1,0 +1,27 @@
+{
+  "name": "psfn",
+  "owner": {
+    "name": "Tu Nguyen",
+    "email": ""
+  },
+  "metadata": {
+    "description": "Personal Persefoni workflow skills",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "psfn",
+      "description": "Persefoni workflow automation: PR creation with Jira integration, code review, ticket planning, Gemini CLI delegation",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/create-pr",
+        "./skills/review",
+        "./skills/plan-ticket",
+        "./skills/gemini-task",
+        "./skills/gemini-review",
+        "./skills/gemini-prompting"
+      ]
+    }
+  ]
+}
