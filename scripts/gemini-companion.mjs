@@ -153,7 +153,7 @@ function runGemini(prompt, options = {}) {
   if (options.model) {
     args.push("-m", options.model);
   } else {
-    args.push("-m", "gemini-2.5-pro");
+    args.push("-m", "gemini-2.5-flash-lite");
   }
 
   args.push("-o", "json");
@@ -263,7 +263,7 @@ function handleTask(argv) {
   else if (modelIdx >= 0 && argv[modelIdx + 1]) model = argv[modelIdx + 1];
 
   // Model aliases
-  const aliases = { pro: "gemini-2.5-pro", flash: "gemini-2.5-flash", lite: "gemini-2.5-flash-lite" };
+  const aliases = { pro: "gemini-2.5-flash-lite", flash: "gemini-2.5-flash", lite: "gemini-2.5-flash-lite" };
   if (model && aliases[model]) model = aliases[model];
 
   // Extract prompt (everything that's not a flag)
@@ -291,7 +291,7 @@ function handleTask(argv) {
     kind: "task",
     status: "running",
     prompt: shorten(prompt),
-    model: model ?? "gemini-2.5-pro",
+    model: model ?? "gemini-2.5-flash-lite",
     startedAt: nowIso(),
     write: yolo,
   };
