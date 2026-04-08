@@ -51,7 +51,15 @@ Read the diff carefully. Understand:
 
 ## Step 4: Fill the PR template
 
-The repo's PR template lives at `.github/pull_request_template.md`. Use it as the structure. Fill each section:
+The repo's PR template lives at `.github/pull_request_template.md`. Use it as the structure.
+
+Delegate the PR description writing to `/psfn:gemini-task` with a prompt that includes:
+- The full diff output from Step 3
+- The PR template structure
+- The Jira ID and branch context from Step 1
+- Instructions to fill each section of the template as described below
+
+The Gemini task prompt should instruct it to fill these sections:
 
 ### Describe your changes
 Write a clear, concise summary of what the PR does and why. Base this on the actual diff — not just commit messages. Use bullet points for multiple changes. Be specific (e.g. "Add Organization column to JP Statutory Report table" not "Update report").
@@ -80,11 +88,13 @@ Mark all items as checked (`[x]`) — the developer has presumably done these. T
 ### Manual Preview Build Commands
 Include the preview commands table exactly as-is from the template — do not modify it.
 
+Use the Gemini output as the PR body. Review it briefly for accuracy against the diff before proceeding.
+
 ## Step 5: Ask to review before creating
 
 Before creating the PR, ask the user: **"Want me to review the changes before creating the PR?"**
 
-- If **yes** — invoke the `psfn/review` skill. This will do a structured code review of the diff (checking type safety, dead code, edge cases, etc.) and present findings. After the review, ask the user if they want to proceed with creating the PR or address the review findings first.
+- If **yes** — invoke `/codex:adversarial-review --wait` to run a Codex adversarial review that challenges the implementation approach and design choices. This is more thorough than a standard review — it questions tradeoffs, assumptions, and where the design could fail. Present the review output verbatim. After the review, ask the user if they want to proceed with creating the PR or address the review findings first.
 - If **no** (or "just create it", "go ahead", etc.) — proceed directly to Step 6.
 
 ## Step 6: Create the PR
