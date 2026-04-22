@@ -25,7 +25,7 @@ Forwarding rules:
 
 Model selection:
 
-- Default to `gemini-2.5-pro` unless the user explicitly asks for a different model.
+- Default to `gemini-2.5-flash` unless the user explicitly asks for a different model.
 - If the user asks for `flash`, use `-m gemini-2.5-flash`.
 - If the user asks for `lite`, use `-m gemini-2.5-flash-lite`.
 - If the user asks for a concrete model name, pass it through with `-m`.
@@ -38,7 +38,7 @@ Execution mode:
 - For complex prompts, pipe via stdin with a heredoc:
 
 ```bash
-cat <<'GEMINI_PROMPT' | gemini -m gemini-2.5-pro -o json --yolo
+cat <<'GEMINI_PROMPT' | gemini -m gemini-2.5-flash -o json --yolo
 <task>
 The user's request, refined with gemini-prompting skill
 </task>
