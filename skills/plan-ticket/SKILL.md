@@ -44,34 +44,32 @@ Validate that each repo exists at `/Users/nguyenquytu/repo/{repo_name}`.
 
 ## Step 3: Spawn the Plan-Ticket Agent
 
-Launch a **single general-purpose Agent** with the plan-ticket agent prompt from `~/.claude/agents/plan-ticket/agent.md`.
+Launch the **ticket-driver agent** (from `~/.claude/plugins/local/psfn/agents/ticket-driver.md`) in plan-only mode via the Agent tool (`subagent_type: ticket-driver`).
 
 Pass to the agent:
-1. The full ticket context from Step 1
-2. The list of repo paths
-3. The extracted search terms
+1. The JIRA-ID
+2. The list of repo paths (via `--repos`)
+3. `--mode plan` to stop after the planning phase (no implementation, no PR)
 
 The agent will:
-- Spawn parallel Explore agents across repos
-- Synthesize findings
-- Enter plan mode and produce the execution plan
-- Exit plan mode for your approval
+- Fetch the ticket (Phase 1a)
+- Run BM25 scope discovery + spawn parallel Explore agents across repos (Phase 1c/1d)
+- Synthesize findings (Phase 1e)
+- Produce an md plan (Phase 3) and enter plan mode for your approval
+- Stop — does NOT proceed to implementation
 
 ### Agent Prompt
 
 ```
-You are the plan-ticket agent. You are the plan-ticket agent. Follow the instructions below.
+{JIRA-ID} --mode plan --repos {comma-separated repo names}
 
-## Ticket Context
+Ticket context (pre-fetched):
 {paste the full ticket summary from Step 1}
 
-## Repos to Explore
-{list of /Users/nguyenquytu/repo/{repo_name} paths}
-
-## Search Terms
+Search terms:
 {extracted entity names, feature keywords, service references}
 
-Begin with PHASE 1 — launch parallel Explore agents for each repo.
+Begin at Phase 1. Stop after Phase 3 plan approval.
 ```
 
 ## Step 4: Review Agent Output

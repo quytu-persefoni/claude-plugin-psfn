@@ -54,7 +54,7 @@ To set up Gemini CLI after installing the plugin:
 | Agent | Description |
 |-------|-------------|
 | **gemini-rescue** | Proactively delegates investigation or fix to Gemini when Claude Code is stuck |
-| **plan-ticket** | Explores repos for patterns relevant to a Jira ticket and produces an execution plan |
+| **ticket-driver** | End-to-end driver for a Jira ticket (fetch → explore → plan → implement → test → review → PR → transition). Supports `--mode plan` for plan-only runs. |
 
 ## License
 
