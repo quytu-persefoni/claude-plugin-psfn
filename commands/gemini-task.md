@@ -1,6 +1,6 @@
 ---
 description: Run a one-shot Gemini task (coding, research, debugging)
-argument-hint: '[--model <pro|flash|lite>] [--yolo] [--json] <prompt>'
+argument-hint: '[--model <flash|lite>] [--yolo] [--json] <prompt>'
 disable-model-invocation: true
 allowed-tools: Bash(node:*)
 ---

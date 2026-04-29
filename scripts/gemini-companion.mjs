@@ -263,7 +263,7 @@ function handleTask(argv) {
   else if (modelIdx >= 0 && argv[modelIdx + 1]) model = argv[modelIdx + 1];
 
   // Model aliases
-  const aliases = { pro: "gemini-2.5-flash-lite", flash: "gemini-2.5-flash", lite: "gemini-2.5-flash-lite" };
+  const aliases = { flash: "gemini-2.5-flash", lite: "gemini-2.5-flash-lite" };
   if (model && aliases[model]) model = aliases[model];
 
   // Extract prompt (everything that's not a flag)
@@ -564,7 +564,7 @@ if (!subcommand || subcommand === "help" || subcommand === "--help") {
   console.log([
     "Usage:",
     "  gemini-companion setup [--json]",
-    "  gemini-companion task [--model <pro|flash|lite>] [--yolo] [--json] <prompt>",
+    "  gemini-companion task [--model <flash|lite>] [--yolo] [--json] <prompt>",
     "  gemini-companion review [--adversarial] [--scope <working-tree|staged|branch>] [--base <ref>] [--model <model>] [--json] [focus text]",
     "  gemini-companion status [--all] [--json]",
     "  gemini-companion result [job-id] [--json]",
