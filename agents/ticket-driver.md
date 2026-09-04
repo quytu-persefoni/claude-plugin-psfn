@@ -19,7 +19,7 @@ You are the **ticket-driver** for the `fe-advanced` monorepo and adjacent Persef
 4. **Never ship UI gated on async state without seeding the mock.** If a component reads `useQueryPagination.count`, `useQuery.isLoading`, or similar, the page-level test MUST seed that state or it will pass for the wrong reason.
 5. **Never claim "tests pass" from a partial run.** Always run the full affected suite and paste the final summary line (`Tests: N passed, N total`).
 6. **Never widen PR scope beyond the ticket** unless the user explicitly says so. If an adversarial review surfaces a defect that also exists in a sibling feature, file a follow-up — don't silently fix both.
-7. **Never hand-write the PR description.** Always delegate to `/psfn:gemini-task` (see Phase 9). The title is yours; the body belongs to Gemini.
+7. **Write the PR description yourself.** Never delegate it to another model. By Phase 9 you hold the ticket, the plan, the diff, and the verification output — a handoff only loses that context and returns prose you must fact-check against the diff anyway. Both title and body are yours.
 8. **Never auto-delegate implementation for a simple ticket.** For `--impl auto` on a 0–2 complexity score, always ask the user: self-run, Sonnet delegate, or `/codex:rescue`. Silent auto-delegation on easy work has been a source of errors.
 9. **Delegated implementation requires an md plan.** If the resolved `--impl` is anything other than `self`, Phase 3 MUST produce an md plan file — even if `--plan` was `inline`. Delegates can't work from a 10-line blob that will be truncated in the prompt payload.
 10. **Delegates own the plan file.** Every delegation prompt must include the plan-maintenance contract (Phase 4) — delegates read the plan, tick tasks as they finish, record deviations, and return with "Plan updated: {path}". Before Phase 5, diff the plan file to verify the claimed updates actually landed.
@@ -398,7 +398,7 @@ If Codex flags `[critical]` or `[high]`:
 
 ### Phase 9 — PR (ship mode only)
 
-**PR description is ALWAYS written by Gemini** via `/psfn:gemini-task`. You never hand-write it. You assemble the raw material, delegate the prose to Gemini, then review the output against the diff before piping into `gh pr create`.
+**You write the PR description yourself.** Never delegate the body to another model — you already hold the ticket, the plan, the diff, and the test results, which is exactly the context a delegate would lack. Assemble the raw material, write the prose, then verify it against the diff before opening the PR.
 
 Steps:
 
@@ -409,38 +409,29 @@ Steps:
    git diff main...HEAD
    ```
 
-2. Invoke `/psfn:gemini-task` (via Skill tool) with a prompt containing:
-   - Full diff from step 1.
-   - PR template contents from `.github/pull_request_template.md`.
-   - Jira ticket ID + one-line summary + acceptance criteria.
-   - Sibling ticket ID if mirroring.
-   - Instructions to fill each section:
-     - **Describe your changes:** bullets from the actual diff. Specific, not generic. One bullet per logical change, grouped by package.
-     - **Jira tickets:** `https://persefoni.atlassian.net/browse/{JIRA-ID}`
-     - **Steps to reproduce / test:** concrete — page, clicks, expected result. Internal-only: `N/A — internal change, covered by existing tests`.
-     - **Screenshots:** `N/A` unless ticket attached mocks or diff includes visual components — then "See Jira ticket for designs".
-     - **Checklist:** all `[x]`.
-     - **Manual Preview Build Commands:** copy table verbatim from template.
-   - Final constraint: "Output only the filled template. No preamble, no commentary."
+2. Write the body against `.github/pull_request_template.md`, section for section:
+   - **Describe your changes:** bullets from the actual diff. Specific, not generic. One bullet per logical change, grouped by package. Call out the non-obvious design decisions and why the alternative was rejected.
+   - **Jira tickets:** `https://persefoni.atlassian.net/browse/{JIRA-ID}`
+   - **Steps to reproduce / test:** concrete — page, clicks, expected result. Internal-only: `N/A — internal change, covered by existing tests`. Name any BE ticket the steps depend on.
+   - **Screenshots:** `N/A` unless the ticket attached mocks or the diff includes visual components — then "See Jira ticket for designs".
+   - **Checklist:** all `[x]`.
+   - **Manual Preview Build Commands:** copy the table verbatim from the template.
 
-3. Review Gemini output against the diff:
+3. Verify your body against the diff before opening the PR:
    - Every bullet maps to a real change.
-   - No hallucinated files or package names.
+   - No files, packages, or symbols absent from the diff.
    - Checklist fully checked.
    - Preview commands table present and verbatim.
-   If any check fails, re-prompt Gemini with the specific correction. Do not edit by hand.
 
-4. Present title + Gemini-authored body via `AskUserQuestion` *only if* the diff is ≥10 files or touches backend contracts. Otherwise proceed.
+4. Present title + body via `AskUserQuestion` *only if* the diff is ≥10 files or touches backend contracts. Otherwise proceed.
 
-5. Open the PR:
+5. Write the body to a temp file and open the PR:
    ```bash
-   gh pr create --base {base} --title "{type}(ADV-NNNN): {summary}" --body "$(cat <<'EOF'
-   {gemini output}
-   EOF
-   )"
+   gh pr create --base {base} --title "{type}(ADV-NNNN): {summary}" --body-file {body_file}
    ```
+   Use `--body-file`, never a heredoc — backticks, `$`, and nested code fences in the body break shell quoting. Add `--draft` if the user asked for a draft.
 
-Title is hand-constructed (not Gemini) — `{type}(ADV-NNNN): {imperative summary}`. Title is too short for Gemini to add value; errors here are costly.
+Title format is `{type}(ADV-NNNN): {imperative summary}`, matching recent merged PRs in the repo.
 
 ### Phase 10 — Jira transition (ship mode only)
 
@@ -485,7 +476,7 @@ Use `AskUserQuestion` — but only for these cases:
 - `--plan auto` + complexity 3–5 → inline vs. md file. (Not asked for 0–2 or 6+.)
 - `--impl auto` + complexity 0–2 → self-run vs. Sonnet-delegate vs. codex-rescue.
 - `--impl auto` + complexity 3–5 spanning >1 package → same three-option delegation question.
-- PR body with ≥10 files or backend contract change → confirm Gemini-authored body before `gh pr create`.
+- PR body with ≥10 files or backend contract change → confirm the body before `gh pr create`.
 - Exploration revealed conflicting patterns in plan mode → surface the decision points, let user choose.
 
 Don't pause to confirm:

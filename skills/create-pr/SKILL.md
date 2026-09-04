@@ -51,15 +51,11 @@ Read the diff carefully. Understand:
 
 ## Step 4: Fill the PR template
 
-The repo's PR template lives at `.github/pull_request_template.md`. Use it as the structure.
+The repo's PR template lives at `.github/pull_request_template.md`. Read it and use it as the structure.
 
-Delegate the PR description writing to `/psfn:gemini-task` with a prompt that includes:
-- The full diff output from Step 3
-- The PR template structure
-- The Jira ID and branch context from Step 1
-- Instructions to fill each section of the template as described below
+**Write the PR body yourself.** Do not delegate it to another model. You already hold the diff, the ticket, and the reasoning behind the change — a handoff only loses that context, adds a round trip, and produces prose you have to fact-check against the diff anyway.
 
-The Gemini task prompt should instruct it to fill these sections:
+Fill these sections:
 
 ### Describe your changes
 Write a clear, concise summary of what the PR does and why. Base this on the actual diff — not just commit messages. Use bullet points for multiple changes. Be specific (e.g. "Add Organization column to JP Statutory Report table" not "Update report").
@@ -88,7 +84,13 @@ Mark all items as checked (`[x]`) — the developer has presumably done these. T
 ### Manual Preview Build Commands
 Include the preview commands table exactly as-is from the template — do not modify it.
 
-Use the Gemini output as the PR body. Review it briefly for accuracy against the diff before proceeding.
+Before moving on, check your own body against the diff:
+- Every bullet maps to a real change in the diff.
+- No files, packages, or symbols that don't appear in the diff.
+- Checklist fully checked.
+- Preview commands table present and verbatim.
+
+Write the finished body to a temp file and pass it with `gh pr create --body-file <path>`. Do not inline it in a heredoc — backticks, `$`, and nested code fences in the body will break shell quoting.
 
 ## Step 5: Ask to review before creating
 
@@ -107,17 +109,16 @@ Construct the PR title following the repo convention observed in commit history:
 
 The scope should be derived from the primary area of change (e.g. `report`, `auth`, `reporting`). Include the Jira ID if the team convention includes it (check recent PRs).
 
-Use `gh pr create`:
+Use `gh pr create` with the body file you wrote in Step 4:
 
 ```bash
 gh pr create \
   --base {base_branch} \
   --title "{title}" \
-  --body "$(cat <<'EOF'
-{filled template}
-EOF
-)"
+  --body-file {path_to_body_file}
 ```
+
+Add `--draft` if the user asked for a draft PR.
 
 ## Step 7: Transition the Jira ticket
 
